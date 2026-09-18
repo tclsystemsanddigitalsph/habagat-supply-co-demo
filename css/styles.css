@@ -723,3 +723,30 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
   }
 }
 
+/* ---------- mobile footer alignment ---------- */
+@media (max-width: 699px) {
+  .site-footer,
+  .footer-grid,
+  .footer-grid > *,
+  .footer-grid h4,
+  .footer-grid p,
+  .footer-grid ul,
+  .footer-grid li,
+  .footer-bottom {
+    text-align: center;
+  }
+
+  .footer-brand {
+    justify-content: center;
+  }
+
+  .footer-bottom {
+    justify-content: center;
+  }
+
+  .footer-bottom > * {
+    width: 100%;
+    text-align: center;
+  }
+}
+
