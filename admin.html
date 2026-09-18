@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3a3630">
+<title>Demo Admin — Habagat Supply Co.</title>
+<meta name="description" content="Demonstration admin dashboard: orders, products, payment verification and store settings.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%233a3630'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='bold' fill='%23fff' text-anchor='middle'%3ENV%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin" data-page="admin">
+
+<div class="demo-bar">
+  <strong>DEMO ADMIN</strong> &mdash; demonstration data only, stored in this browser. No real authentication, no real payments.
+  <a href="index.html">Back to storefront</a>
+</div>
+
+<main id="main">
+  <div class="wrap admin-shell">
+
+    <div class="admin-top">
+      <span class="brand-mark" aria-hidden="true">HS</span>
+      <div>
+        <h1 data-store-name>Habagat Supply Co. — Admin</h1>
+        <p class="sub">Manage orders, products, manual payment verification and store settings.</p>
+      </div>
+      <div class="admin-top-actions">
+        <a class="btn btn-outline btn-sm" href="index.html" id="openStorefront">Open storefront</a>
+        <button class="btn btn-danger btn-sm" type="button" id="resetDemo">Reset demo data</button>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" id="adminTabs" aria-label="Admin sections"></div>
+
+    <div id="adminMain">
+      <div id="adminBody" role="tabpanel"></div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <div class="panel-head"><h3>Package scope</h3><p>What this demo represents.</p></div>
+      <div class="value-grid">
+        <div class="value-item">
+          <h3>₱8,999 — Online Shop + Admin</h3>
+          <p>Everything you see here: storefront, product catalog with variations, cart, checkout, manual payment options with proof submission, order management, product management, payment verification and basic store settings.</p>
+        </div>
+        <div class="value-item">
+          <h3>₱5,999 — Basic Online Shop</h3>
+          <p>The same customer-facing storefront without this admin dashboard. Orders would be sent to you by email instead of managed here.</p>
+        </div>
+        <div class="value-item">
+          <h3>Custom Business Website/System</h3>
+          <p>Payment gateways, customer accounts, membership and loyalty programmes, inventory automation, ERP or accounting integration, advanced analytics and multi-role admin. <strong>Available through Custom Quote.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <p class="small muted" style="margin-top:18px">
+      Demo data lives in this browser's local storage. Clearing site data, or using <strong>Reset demo data</strong>, restores the original products, the three sample orders and the default settings.
+    </p>
+  </div>
+</main>
+
+<!-- ============ product modal ============ -->
+<div class="modal-backdrop" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="modalTitle">Edit product</h2>
+        <p class="sub" id="modalSub"></p>
+      </div>
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" type="button" data-close-modal>Cancel</button>
+      <button class="btn btn-outline" type="button" data-delete-product>Delete product</button>
+      <button class="btn btn-primary" type="button" data-save-product>Save product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ order modal ============ -->
+<div class="modal-backdrop" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="orderTitle">Order</h2>
+        <p class="sub" id="orderSub"></p>
+      </div>
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="orderBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" type="button" data-close-modal>Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d4a">
+<title>Habagat Supply Co. — Home &amp; Outdoor Goods, Cebu</title>
+<meta name="description" content="Practical home and outdoor goods from a small Cebu-based shop. Baskets, kitchenwares, drinkware and camping gear.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232f5d4a'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='bold' fill='%23fff' text-anchor='middle'%3EHB%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="home">
+
+<div data-header></div>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <h1>Goods that hold up at home and out of town.</h1>
+        <p>We keep a short list of everyday things — woven baskets, sturdy kitchenwares, drinkware that keeps its temperature, and gear for the weekend. Chosen because we use them, not because they sell fast.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="shop.html">Shop all products</a>
+          <a class="btn btn-outline" href="about.html">About the shop</a>
+        </div>
+        <p class="hero-note">Pickup in Cebu City · Nationwide courier · GCash, QR Ph &amp; bank transfer</p>
+      </div>
+      <figure class="hero-figure">
+        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 400' width='520' height='400' role='img' aria-label='Illustration of home and outdoor goods on a shelf'%3E%3Crect width='520' height='400' fill='%23efe9df'/%3E%3Crect x='0' y='318' width='520' height='4' fill='%23d8d0c2'/%3E%3Cpath d='M60 318 L78 232 H150 L168 318 Z' fill='%23e6dfd2' stroke='%236f6558' stroke-width='3'/%3E%3Cpath d='M50 232 H178' stroke='%234b4339' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M84 250 H154 M88 272 H150 M92 294 H146' stroke='%23a89d8d' stroke-width='2'/%3E%3Crect x='196' y='196' width='104' height='122' rx='20' fill='%23f2ece2' stroke='%236f6558' stroke-width='3'/%3E%3Ccircle cx='278' cy='216' r='6' fill='none' stroke='%238d8375' stroke-width='2.5'/%3E%3Cpath d='M216 240 H282 M216 262 H282 M216 284 H262' stroke='%23bdb2a1' stroke-width='2'/%3E%3Cpath d='M330 210 H394 L388 318 H336 Z' fill='%23f4f0e8' stroke='%236f6558' stroke-width='3'/%3E%3Cpath d='M328 210 H396' stroke='%234b4339' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M330 240 H394' stroke='%23bdb2a1' stroke-width='2'/%3E%3Crect x='412' y='248' width='66' height='70' rx='6' fill='%23e6dfd2' stroke='%236f6558' stroke-width='3'/%3E%3Cpath d='M412 262 H478 M412 304 H478' stroke='%23bdb2a1' stroke-width='2'/%3E%3Ccircle cx='152' cy='180' r='26' fill='%23e6dfd2' stroke='%236f6558' stroke-width='3'/%3E%3Cpath d='M152 154 v-14 M152 206 v14 M126 180 h-14 M178 180 h14' stroke='%23b08a3c' stroke-width='3'/%3E%3C/svg%3E"
+             alt="Illustration of baskets, a cutting board, a tumbler and a lantern on a shelf" width="520" height="400">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ VALUE ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="value-grid">
+        <div class="value-item">
+          <h3>Chosen, not stocked</h3>
+          <p>Every item is something we have used ourselves. If it does not survive a year in a real home, it does not go on the shelf.</p>
+        </div>
+        <div class="value-item">
+          <h3>Manual payment, verified</h3>
+          <p>Pay by GCash, QR Ph or bank transfer and upload your receipt. A person checks it — usually within the same working day.</p>
+        </div>
+        <div class="value-item">
+          <h3>Cebu pickup available</h3>
+          <p>Collect from our Escario Street unit on weekdays, or have it delivered nationwide through our courier partner.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Featured this month</h2>
+        <a class="link-more" href="shop.html">See all products</a>
+      </div>
+      <div class="grid-products" id="featuredGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORIES ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Shop by category</h2>
+      </div>
+      <div class="panel">
+        <ul class="list-plain" id="homeCategories"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INTRO ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>A small shop in Cebu City</h2>
+          <p>What we sell, and why the list is short.</p>
+        </div>
+        <div id="homeIntro"></div>
+        <a class="btn btn-outline" href="about.html">Read more about us</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAYMENT ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>How ordering works</h2>
+          <p>Four steps, no account needed.</p>
+        </div>
+        <ol class="list-plain">
+          <li><strong>1. Add what you need to the cart</strong> and submit your details at checkout.</li>
+          <li><strong>2. Pay manually</strong> — GCash, QR Ph or bank transfer, using the instructions shown at checkout.</li>
+          <li><strong>3. Upload your receipt</strong> so our team can verify the payment by hand.</li>
+          <li><strong>4. We confirm and send it</strong> — 1 to 2 days within Metro Cebu, 3 to 5 days for provincial courier.</li>
+        </ol>
+        <div class="callout" style="margin-top:16px">
+          <p class="small"><strong>This is a demo store.</strong> It shows the ₱8,999 Online Shop + Admin package from TCL Systems &amp; Digitals PH. Orders, payments and admin actions are simulated in your browser.</p>
+        </div>
+        <a class="btn btn-primary" href="shop.html" style="margin-top:16px">Start shopping</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div data-footer></div>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

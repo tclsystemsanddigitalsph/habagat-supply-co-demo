@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d4a">
+<title>Contact — Habagat Supply Co.</title>
+<meta name="description" content="Get in touch with Habagat Supply Co. in Cebu City.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232f5d4a'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='bold' fill='%23fff' text-anchor='middle'%3EHB%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="contact">
+
+<div data-header></div>
+
+<main id="main">
+
+  <section class="section-tight" style="padding-top:24px">
+    <div class="wrap">
+      <h1>Contact us</h1>
+      <p class="muted" style="max-width:56ch">Questions about a product, an order, or a bulk purchase? Send a message and a real person will reply.</p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="cart-layout">
+        <div class="panel">
+          <div class="panel-head"><h2>Send a message</h2><p>For demo purposes this form does not send email.</p></div>
+          <form id="contactForm" novalidate>
+            <div class="field-row two">
+              <div class="field" data-field="cname">
+                <label for="cname">Your name</label>
+                <input class="input" id="cname" name="cname" autocomplete="name" required>
+                <div class="field-error">Please enter your name.</div>
+              </div>
+              <div class="field" data-field="cemail">
+                <label for="cemail">Email address</label>
+                <input class="input" id="cemail" name="cemail" type="email" autocomplete="email" required>
+                <div class="field-error">Please enter a valid email address.</div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="csubject">Subject</label>
+              <select class="select" id="csubject" name="csubject">
+                <option>General enquiry</option>
+                <option>Question about a product</option>
+                <option>Follow up on an order</option>
+                <option>Bulk or reseller purchase</option>
+                <option>Website feedback</option>
+              </select>
+            </div>
+            <div class="field" data-field="cmessage">
+              <label for="cmessage">Message</label>
+              <textarea class="textarea" id="cmessage" name="cmessage" required></textarea>
+              <div class="field-error">Please write at least a short message.</div>
+            </div>
+            <button class="btn btn-primary" type="submit">Send message</button>
+            <div class="callout" id="contactDone" hidden style="margin-top:16px">
+              <p class="small">Thanks — your message was recorded in demo mode. In a live store it would arrive in the shop inbox.</p>
+            </div>
+          </form>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h3>Store information</h3></div>
+            <div id="contactInfo"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Before you message us</h3></div>
+            <ul class="list-plain">
+              <li><strong>Order status?</strong> Check your reference number first — most answers are on the confirmation page.</li>
+              <li><strong>Payment not verified yet?</strong> Verification is manual and usually finishes the same working day.</li>
+              <li><strong>Bulk order?</strong> Tell us the quantities and your target date so we can check stock honestly.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div data-footer></div>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
