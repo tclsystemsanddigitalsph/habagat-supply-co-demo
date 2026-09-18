@@ -1,13 +1,12 @@
 /* =========================================================
    Habagat Supply Co. — DEMO ADMIN
    No authentication. All data is client-side only.
-   ========================================================= */
+   \========================================================= */
 (function (global) {
   "use strict";
   var S = global.HabagatStore, UI = global.HabagatUI;
   var esc = UI.esc;
   var doc = global.document;
-
   var state = {
     tab: "dashboard",
     orderQuery: "",
@@ -17,26 +16,44 @@
     editingId: null,
     draft: null
   };
-
   /* ---------------- helpers ---------------- */
   function statusClass(s) { return String(s || "").toLowerCase().replace(/\s+/g, "-"); }
-
+  function productArtSrc(value) {
+    if (!value) return global.HabagatArt("default");
+    if (
+      value.indexOf("data:") === 0 ||
+      value.indexOf("http://") === 0 ||
+      value.indexOf("https://") === 0 ||
+      value.indexOf("/") === 0 ||
+      value.indexOf("./") === 0 ||
+      value.indexOf("../") === 0
+    ) return value;
+    return global.HabagatArt(value);
+  }
+  function adminStatuses() {
+    var statuses = S.statuses.slice();
+    if (statuses.indexOf("Canceled") === -1) statuses.push("Canceled");
+    return statuses;
+  }
+  function validOrders() {
+      return S.getOrders().filter(function (o) {
+        return o && o.ref && o.customer && Array.isArray(o.items);
+      });
+    }
   function statCard(k, v, sub, tone) {
     return '<div class="stat' + (tone ? " " + tone : "") + '">' +
       '<span class="k">' + esc(k) + '</span>' +
       '<span class="v">' + v + '</span>' +
       '<span class="s">' + esc(sub) + '</span></div>';
   }
-
   function fmtProofBytes(name) {
     if (!name) return "—";
     var ext = String(name).split(".").pop().toUpperCase().slice(0, 4);
     return ext;
   }
-
   /* ---------------- computations ---------------- */
   function metrics() {
-    var orders = S.getOrders();
+    var orders = validOrders();
     var products = S.getProducts();
     var pending = orders.filter(function (o) { return o.status === "Pending"; }).length;
     var unverified = orders.filter(function (o) { return o.paymentStatus === "pending"; }).length;
@@ -55,26 +72,21 @@
       totalProducts: products.length,
       revenue: revenue,
       verifiedRevenue: verifiedRevenue,
-      open: orders.filter(function (o) { return o.status !== "Completed"; }).length
+      open: orders.filter(function (o) { return o.status !== "Completed" && o.status !== "Canceled"; }).length
     };
   }
-
   /* ---------------- dashboard ---------------- */
   function renderDashboard() {
     var m = metrics();
-    var orders = S.getOrders();
+    var orders = validOrders();
     var products = S.getProducts();
-
     var byStatus = {};
-    S.statuses.forEach(function (s) { byStatus[s] = 0; });
+    adminStatuses().forEach(function (s) { byStatus[s] = 0; });
     orders.forEach(function (o) { if (byStatus[o.status] != null) byStatus[o.status]++; });
-
     var recent = orders.slice(0, 5);
     var attention = orders.filter(function (o) { return o.paymentStatus !== "verified" && o.status !== "Completed"; }).slice(0, 4);
-
     var catCounts = {};
     products.forEach(function (p) { catCounts[p.category] = (catCounts[p.category] || 0) + 1; });
-
     return '' +
       '<div class="stats">' +
         statCard("Total orders", m.orders, m.open + " still open") +
@@ -82,7 +94,6 @@
         statCard("Awaiting payment check", m.unverified, "Needs manual verification", m.unverified ? "alert" : "") +
         statCard("Active products", m.activeProducts, "of " + m.totalProducts + " listed") +
       '</div>' +
-
       '<div class="settings-grid" style="margin-top:18px">' +
         '<div class="panel">' +
           '<div class="panel-head"><h3>Recent orders</h3><p>Latest five submissions from the storefront.</p></div>' +
@@ -106,7 +117,6 @@
               }).join("") + '</div>'
             : '<p class="muted">No orders yet. Submit one from the storefront checkout to see it appear here.</p>') +
         '</div>' +
-
         '<div>' +
           '<div class="panel">' +
             '<div class="panel-head"><h3>Needs attention</h3><p>Orders with unverified payment and an open status.</p></div>' +
@@ -124,7 +134,7 @@
           '<div class="panel">' +
             '<div class="panel-head"><h3>Order pipeline</h3></div>' +
             '<div class="definition">' +
-              S.statuses.map(function (s) {
+              adminStatuses().map(function (s) {
                 return '<div class="row"><dt>' + esc(s) + '</dt><dd><strong>' + byStatus[s] + '</strong> order' +
                   (byStatus[s] === 1 ? "" : "s") + '</dd></div>';
               }).join("") +
@@ -142,7 +152,6 @@
         '</div>' +
       '</div>';
   }
-
   /* ---------------- products ---------------- */
   function renderProducts() {
     var products = S.getProducts();
@@ -150,7 +159,6 @@
     var list = q ? products.filter(function (p) {
       return (p.name + " " + p.category).toLowerCase().indexOf(q) >= 0;
     }) : products;
-
     return '' +
       '<div class="toolbar">' +
         '<input class="input grow" type="search" placeholder="Search products by name or category" data-product-search value="' + esc(state.productQuery) + '" aria-label="Search products">' +
@@ -163,7 +171,7 @@
             list.map(function (p) {
               return '<tr>' +
                 '<td><div class="cell-product">' +
-                  '<img class="product-thumb-sm" src="' + p.art + '" alt="" width="44" height="44">' +
+                  '<img class="product-thumb-sm" src="' + productArtSrc(p.art) + '" alt="" width="44" height="44">' +
                   '<span><span class="t">' + esc(p.name) + '</span>' +
                   '<span class="c">' + esc(p.id) + '</span></span>' +
                 '</div></td>' +
@@ -182,10 +190,9 @@
           '</tbody></table></div>'
         : '<div class="empty"><h3>No matching products</h3><p>Try a different search term, or add a new product.</p></div>');
   }
-
   /* ---------------- orders ---------------- */
   function renderOrders() {
-    var orders = S.getOrders();
+    var orders = validOrders();
     var q = state.orderQuery.toLowerCase();
     var list = orders.filter(function (o) {
       if (state.orderStatus !== "All" && o.status !== state.orderStatus) return false;
@@ -193,12 +200,11 @@
       return (o.ref + " " + o.customer.name + " " + o.customer.email + " " + o.customer.mobile + " " + o.paymentMethod)
         .toLowerCase().indexOf(q) >= 0;
     });
-
     return '' +
       '<div class="toolbar">' +
         '<input class="input grow" type="search" placeholder="Search by reference, customer, email or mobile" data-order-search value="' + esc(state.orderQuery) + '" aria-label="Search orders">' +
         '<select class="select sm" data-order-status aria-label="Filter by status">' +
-          ['All'].concat(S.statuses).map(function (s) {
+          ['All'].concat(adminStatuses()).map(function (s) {
             return '<option value="' + esc(s) + '"' + (s === state.orderStatus ? " selected" : "") + '>' + esc(s === "All" ? "All statuses" : s) + '</option>';
           }).join("") +
         '</select>' +
@@ -215,7 +221,7 @@
                 '<td>' + esc(o.paymentMethod) + '<br><span class="status ' + statusClass(payLabel) + '">' + payLabel + '</span></td>' +
                 '<td class="num">' + S.peso(total) + '</td>' +
                 '<td><select class="select-inline" data-status-select="' + esc(o.ref) + '" aria-label="Status for ' + esc(o.ref) + '">' +
-                  S.statuses.map(function (s) {
+                  adminStatuses().map(function (s) {
                     return '<option value="' + esc(s) + '"' + (s === o.status ? " selected" : "") + '>' + esc(s) + '</option>';
                   }).join("") +
                 '</select></td>' +
@@ -225,7 +231,6 @@
           '</tbody></table></div>'
         : '<div class="empty"><h3>No orders match</h3><p>Try clearing the search or switching the status filter. New orders from the storefront checkout appear here instantly.</p></div>');
   }
-
   /* ---------------- settings ---------------- */
   function renderSettings() {
     var s = S.getSettings();
@@ -241,7 +246,6 @@
         '<textarea class="textarea" id="set-' + key + '" name="' + key + '">' + esc(s[key]) + '</textarea>' +
       '</div>';
     }
-
     return '<form id="settingsForm">' +
       '<div class="settings-grid">' +
         '<div class="panel">' +
@@ -282,7 +286,6 @@
       '</div>' +
     '</form>';
   }
-
   /* ---------------- shell ---------------- */
   function panels() {
     return {
@@ -292,7 +295,6 @@
       settings: renderSettings()
     };
   }
-
   function renderTabs() {
     var m = metrics();
     var tabs = [
@@ -308,7 +310,6 @@
       '</button>';
     }).join("");
   }
-
   function render() {
     doc.getElementById("adminTabs").innerHTML = renderTabs();
     var body = doc.getElementById("adminBody");
@@ -319,13 +320,11 @@
     if (extra) extra.hidden = true;
     global.scrollTo({ top: global.scrollY > 140 ? doc.getElementById("adminTabs").offsetTop - 20 : 0, behavior: "smooth" });
   }
-
   function renderKeepScroll() {
     var y = global.scrollY;
     render();
     global.scrollTo({ top: y });
   }
-
   /* ---------------- product modal ---------------- */
   function openProductModal(id) {
     var p = id ? JSON.parse(JSON.stringify(S.getProduct(id))) : {
@@ -335,16 +334,13 @@
     };
     state.editingId = id || null;
     state.draft = p;
-
     var backdrop = doc.getElementById("productModal");
     backdrop.classList.add("open");
     doc.getElementById("modalTitle").textContent = id ? "Edit product" : "Add product";
     doc.getElementById("modalSub").textContent = id
       ? "Changes appear on the storefront as soon as you save."
       : "The new product appears in the shop right away.";
-
     var artChoices = ["basket", "board", "blanket", "tumbler", "tote", "mug", "placemat", "picnic", "lantern", "tray", "default"];
-
     doc.getElementById("modalBody").innerHTML = '' +
       '<div class="field">' +
         '<label for="pName">Product name</label>' +
@@ -397,16 +393,13 @@
         '<label class="check-card"><input type="checkbox" id="pFeatured"' + (p.featured ? " checked" : "") + '>' +
           '<span><strong>Featured</strong><span>Shown on the home page.</span></span></label>' +
       '</div>';
-
     renderVarChips();
     renderSpecRows();
-
     doc.getElementById("pArt").addEventListener("change", function () {
       var prev = doc.getElementById("artPreview");
       if (prev) prev.src = global.HabagatArt(this.value);
     });
   }
-
   function renderSpecRows() {
     var keys = ["Material", "Size", "Care"];
     var specs = state.draft.specs || {};
@@ -416,18 +409,16 @@
       '</div>';
     }).join("");
   }
-
   function renderVarChips() {
     var opts = state.draft.options || (state.draft.options = { label: "", values: [] });
     var el = doc.getElementById("varChips");
     if (!el) return;
     el.innerHTML = opts.values.length
       ? opts.values.map(function (v, i) {
-          return '<span class="var-chip">' + esc(v) + '<button type="button" data-del-option="' + i + '" aria-label="Remove ' + esc(v) + '">&times;</button></span>';
+          return '<span class="var-chip">' + esc(v) + '<button type="button" data-del-option="' + i + '" aria-label="Remove ' + esc(v) + '">×</button></span>';
         }).join("")
       : '<span class="muted small">No variations — this product will be a single option.</span>';
   }
-
   function collectProduct() {
     var opts = state.draft.options || { label: "", values: [] };
     var label = (doc.getElementById("varLabel").value || "").trim();
@@ -438,13 +429,11 @@
     });
     var name = doc.getElementById("pName").value.trim();
     if (!name) return null;
-
     var id = state.editingId || ("p-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40));
     if (!state.editingId) {
       var existing = S.getProduct(id);
       if (existing) id = id + "-" + Math.floor(Math.random() * 900 + 100);
     }
-
     return {
       id: id,
       name: name,
@@ -459,7 +448,6 @@
       options: (label && opts.values.length) ? { label: label, values: opts.values.slice() } : null
     };
   }
-
   /* ---------------- order drawer ---------------- */
   function openOrderModal(ref) {
     var o = S.getOrder(ref);
@@ -467,15 +455,12 @@
     state.openOrderRef = ref;
     var subtotal = o.items.reduce(function (n, i) { return n + i.price * i.qty; }, 0);
     var total = subtotal + (o.shipping || 0);
-
     doc.getElementById("orderModal").classList.add("open");
     doc.getElementById("orderTitle").textContent = "Order " + o.ref;
     doc.getElementById("orderSub").textContent = "Submitted " + S.formatDate(o.createdAt);
-
     var payBadge = o.paymentStatus === "verified" ? '<span class="status verified">Payment verified</span>'
       : o.paymentStatus === "rejected" ? '<span class="status rejected">Payment rejected</span>'
       : '<span class="status unverified">Awaiting verification</span>';
-
     doc.getElementById("orderBody").innerHTML = '' +
       '<div class="panel" style="border-radius:var(--radius)">' +
         '<div class="panel-head"><h3>Customer</h3></div>' +
@@ -492,7 +477,6 @@
           '</dd></div>' +
         '</dl>' +
       '</div>' +
-
       '<div class="panel" style="border-radius:var(--radius)">' +
         '<div class="panel-head"><h3>Items</h3></div>' +
         '<div class="table-wrap" style="border:0">' +
@@ -511,7 +495,6 @@
           '<div class="summary-row total"><span class="k">Total</span><span>' + S.peso(total) + '</span></div>' +
         '</div>' +
       '</div>' +
-
       '<div class="panel" style="border-radius:var(--radius)">' +
         '<div class="panel-head"><h3>Payment proof</h3><p>Demo submission — stored as text in this browser only.</p></div>' +
         (o.proof && o.proof.submitted
@@ -528,34 +511,82 @@
           '<button class="btn btn-danger btn-sm" type="button" data-reject="' + esc(o.ref) + '">Reject / unverify</button>' +
         '</div>' +
       '</div>' +
-
       '<div class="panel" style="border-radius:var(--radius)">' +
         '<div class="panel-head"><h3>Order status</h3></div>' +
         '<div class="field">' +
           '<select class="select" data-modal-status="' + esc(o.ref) + '" aria-label="Order status">' +
-            S.statuses.map(function (s) { return '<option value="' + esc(s) + '"' + (s === o.status ? " selected" : "") + '>' + esc(s) + '</option>'; }).join("") +
+            adminStatuses().map(function (s) { return '<option value="' + esc(s) + '"' + (s === o.status ? " selected" : "") + '>' + esc(s) + '</option>'; }).join("") +
           '</select>' +
-          '<span class="hint">Pending → Confirmed → Processing → Ready → Completed</span>' +
+          '<span class="hint">Pending → Confirmed → Processing → Ready → Completed · Canceled is available when an order will not proceed.</span>' +
         '</div>' +
+      '</div>' +
+      '<div class="panel" style="border-radius:var(--radius)">' +
+        '<div class="panel-head"><h3>Delete order</h3><p>Permanently remove this order from the demo browser storage.</p></div>' +
+        '<button class="btn btn-danger btn-sm" type="button" data-delete-order="' + esc(o.ref) + '">Delete Order</button>' +
       '</div>' +
       '<p class="small muted">Reference ' + esc(o.ref) + '. This record lives in your browser storage for the demo session.</p>';
   }
-
   function refreshOpenOrder() {
     if (state.openOrderRef && doc.getElementById("orderModal").classList.contains("open")) {
       openOrderModal(state.openOrderRef);
     }
   }
-
   /* ---------------- events ---------------- */
-  function wire() {
+    function deleteOrder(ref) {
+    var key = "habagat.orders.v1";
+    var orders;
+    try {
+      orders = JSON.parse(global.localStorage.getItem(key) || "[]");
+    } catch (err) {
+      orders = [];
+    }
+    if (!Array.isArray(orders)) orders = [];
+    var next = orders.filter(function (o) { return !o || o.ref !== ref; });
+    global.localStorage.setItem(key, JSON.stringify(next));
+    return next.length !== orders.length;
+  }
+  function handlePaymentAction(e) {
+      var b;
+      if ((b = e.target.closest("[data-verify]"))) {
+        var o = S.getOrder(b.getAttribute("data-verify"));
+        if (o) {
+          o.paymentStatus = "verified";
+          o.verifiedAt = new Date().toISOString();
+          if (o.status === "Pending") o.status = "Confirmed";
+          S.saveOrder(o);
+          UI.toast(o.ref + ": payment marked verified");
+          renderKeepScroll();
+          refreshOpenOrder();
+        }
+        return true;
+      }
+      if ((b = e.target.closest("[data-reject]"))) {
+        var o2 = S.getOrder(b.getAttribute("data-reject"));
+        if (o2) {
+          if (o2.paymentStatus === "rejected") {
+            o2.paymentStatus = "pending";
+            o2.rejectedNote = "";
+            UI.toast(o2.ref + ": payment set back to unverified");
+          } else {
+            o2.paymentStatus = "rejected";
+            o2.rejectedNote = "Marked rejected by staff during demo review.";
+            UI.toast(o2.ref + ": payment marked rejected");
+          }
+          S.saveOrder(o2);
+          renderKeepScroll();
+          refreshOpenOrder();
+        }
+        return true;
+      }
+      return false;
+    }
+function wire() {
     doc.getElementById("adminTabs").addEventListener("click", function (e) {
       var t = e.target.closest("[data-tab]");
       if (!t) return;
       state.tab = t.getAttribute("data-tab");
       render();
     });
-
     doc.getElementById("adminBody").addEventListener("click", function (e) {
       var b;
       if ((b = e.target.closest("[data-open-order]"))) { openOrderModal(b.getAttribute("data-open-order")); return; }
@@ -584,37 +615,7 @@
         renderKeepScroll();
         return;
       }
-      if ((b = e.target.closest("[data-verify]"))) {
-        var o = S.getOrder(b.getAttribute("data-verify"));
-        if (o) {
-          o.paymentStatus = "verified";
-          o.verifiedAt = new Date().toISOString();
-          if (o.status === "Pending") o.status = "Confirmed";
-          S.saveOrder(o);
-          UI.toast(o.ref + ": payment marked verified");
-          renderKeepScroll(); refreshOpenOrder();
-        }
-        return;
-      }
-      if ((b = e.target.closest("[data-reject]"))) {
-        var o2 = S.getOrder(b.getAttribute("data-reject"));
-        if (o2) {
-          if (o2.paymentStatus === "rejected") {
-            o2.paymentStatus = "pending";
-            o2.rejectedNote = "";
-            UI.toast(o2.ref + ": payment set back to unverified");
-          } else {
-            o2.paymentStatus = "rejected";
-            o2.rejectedNote = "Marked rejected by staff during demo review.";
-            UI.toast(o2.ref + ": payment marked rejected");
-          }
-          S.saveOrder(o2);
-          renderKeepScroll(); refreshOpenOrder();
-        }
-        return;
-      }
-    });
-
+      });
     // settings submit + reset
     doc.getElementById("adminBody").addEventListener("submit", function (e) {
       if (e.target.id !== "settingsForm") return;
@@ -627,7 +628,6 @@
       UI.toast("Settings saved — the storefront is updated");
       renderKeepScroll();
     });
-
     // live search inputs
     doc.getElementById("adminBody").addEventListener("input", function (e) {
       if (e.target.matches("[data-product-search]")) {
@@ -650,14 +650,12 @@
         global.scrollTo({ top: y2 });
       }
     });
-
     doc.getElementById("adminBody").addEventListener("change", function (e) {
       var sel = e.target.closest("[data-status-select]");
       if (sel) {
         var o = S.getOrder(sel.getAttribute("data-status-select"));
         if (o) {
           o.status = sel.value;
-          if (o.status === "Completed" && o.paymentStatus === "pending") o.paymentStatus = "verified";
           S.saveOrder(o);
           UI.toast(o.ref + " status set to " + o.status);
           renderKeepScroll();
@@ -667,7 +665,6 @@
       var s2 = e.target.closest("[data-order-status]");
       if (s2) { state.orderStatus = s2.value; renderKeepScroll(); }
     });
-
     // product modal
     var pm = doc.getElementById("productModal");
     pm.addEventListener("click", function (e) {
@@ -711,10 +708,24 @@
         renderKeepScroll();
       }
     });
-
     // order modal
     var om = doc.getElementById("orderModal");
     om.addEventListener("click", function (e) {
+      if (handlePaymentAction(e)) return;
+      var del = e.target.closest("[data-delete-order]");
+      if (del) {
+        var ref = del.getAttribute("data-delete-order");
+        if (!global.confirm("Delete order " + ref + "?\n\nThis permanently removes only this order from the demo browser storage. This cannot be undone.")) return;
+        if (deleteOrder(ref)) {
+          om.classList.remove("open");
+          state.openOrderRef = null;
+          UI.toast(ref + " deleted");
+          renderKeepScroll();
+        } else {
+          UI.toast("Order could not be deleted");
+        }
+        return;
+      }
       if (e.target.matches("[data-close-modal]") || e.target === om) { om.classList.remove("open"); state.openOrderRef = null; }
     });
     om.addEventListener("change", function (e) {
@@ -723,13 +734,11 @@
       var o = S.getOrder(sel.getAttribute("data-modal-status"));
       if (o) {
         o.status = sel.value;
-        if (o.status === "Completed" && o.paymentStatus === "pending") o.paymentStatus = "verified";
         S.saveOrder(o);
         UI.toast(o.ref + " status set to " + o.status);
         renderKeepScroll(); refreshOpenOrder();
       }
     });
-
     doc.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
         pm.classList.remove("open");
@@ -737,7 +746,6 @@
         state.openOrderRef = null;
       }
     });
-
     doc.getElementById("resetDemo").addEventListener("click", function () {
       if (!global.confirm("Reset demo data?\n\nThis restores the original products, the three sample orders and the default store settings. Anything you added or edited during the session will be lost.")) return;
       S.reset();
@@ -745,13 +753,11 @@
       render();
       UI.toast("Demo data restored to its original state");
     });
-
     doc.getElementById("openStorefront").addEventListener("click", function (e) {
       e.preventDefault();
       global.open("index.html", "_blank");
     });
   }
-
   /* ---------------- boot ---------------- */
   doc.addEventListener("DOMContentLoaded", function () {
     S.init(false);
